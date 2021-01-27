@@ -1,25 +1,49 @@
 import React, { Component } from 'react';
+import giphy from 'giphy-api';
+
 import SearchBar from './search_bar';
 import Gif from './gif';
 import GifList from './gif_list';
 
 class App extends Component {
-  render () {
-    const gifs = [
-      { id: "LmNwrBhejkK9EFP504" },
-      { id: "PiQejEf31116URju4V" }
-    ];
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      gifs: [],
+      selectedGifId: "LmNwrBhejkK9EFP504"
+    };
+  }
+
+  search = (query) => {
+    giphy('CSVWi7ZG1REmuZjCznsinhP1okoC3zxx').search({
+      q: query,
+      rating: 'g',
+      limit: 10
+    }, (err, res) => {
+      this.setState({
+        gifs: res.data
+      });
+    });
+  };
+
+  selectGif = (id) => {
+    this.setState({
+      selectedGifId: id
+    });
+  }
+
+  render () {
     return (
       <div>
         <div className="left-scene">
-          <SearchBar />
+          <SearchBar searchFunction={this.search} />
           <div className="selected-gif">
-            <Gif id="LmNwrBhejkK9EFP504" />
+            <Gif id={this.state.selectedGifId} />
           </div>
         </div>
         <div className="right-scene">
-            <GifList gifs={gifs} />
+          <GifList gifs={this.state.gifs} selectGif={this.selectGif} />
         </div>
       </div>
     );
